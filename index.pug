@@ -97,9 +97,12 @@ html(lang="id", dir="ltr")
     :coffee
       String::toCapital1st = -> @charAt(0).toUpperCase() + @slice 1
 
-      # TODO: use `Webview`'s `select` bind to fetch JSON cache
+      # TEMP: can't use it rn cuz fuck Fedora
+      # @data =
+      #   alt: select 'alt'
+      #   criteria: select 'criteria'
 
-      # for testing purposes only (fuck you, Fedora)
+      # TEMP: fallback for code above. will be deleted when code above works
       @data =
         alt: JSON.parse '[{"name":"Amazon Web Services","values":[{"name":"price","value":10},{"name":"memory","value":4},{"name":"storage","value":80},{"name":"uptime","value":100},{"name":"security","value":3}]},{"name":"Google Cloud Platform","values":[{"name":"price","value":15},{"name":"memory","value":8},{"name":"storage","value":160},{"name":"uptime","value":90},{"name":"security","value":2}]},{"name":"Microsoft Azure","values":[{"name":"price","value":20},{"name":"memory","value":16},{"name":"storage","value":200},{"name":"uptime","value":80},{"name":"security","value":3}]}]'
         criteria: JSON.parse '[{"name":"price","nameL10N":"Harga","type":"cost","weight":0.2},{"name":"memory","nameL10N":"Memori","type":"benefit","weight":0.2},{"name":"storage","nameL10N":"Penyimpanan","type":"benefit","weight":0.2},{"name":"uptime","nameL10N":"Ketersediaan","type":"benefit","weight":0.2},{"name":"security","nameL10N":"Keamanan","type":"benefit","weight":0.2}]'
