@@ -10,8 +10,6 @@ html(lang="id", dir="ltr")
     meta(name="author", content=author)
     title=name
     :sass
-      @import 'https://rsms.me/inter/inter.css'
-
       // Reset //
 
       *
@@ -33,6 +31,8 @@ html(lang="id", dir="ltr")
     :sass
       @use "sass:color"
       @use "sass:math"
+      
+      @import 'https://rsms.me/inter/inter.css'
 
       /*  #000
           #1A1A1A
@@ -56,7 +56,7 @@ html(lang="id", dir="ltr")
       // Dasar //
 
       a, :link, :visited, :any-link
-        color: inherit
+        color: currentColor
         cursor: pointer
         text-decoration:
           thickness: 1px
@@ -82,21 +82,24 @@ html(lang="id", dir="ltr")
         font-size: math.div(13em, 16)
 
       body
-        width: calc(100vw * (30/32))
-        min-width: 960px
-        min-height: 100vh
-        font-family: InterDisplay, sans-serif
-        font-feature-settings: 'tnum'
-        font-variant-alternates: styleset(disambiguation)
+        margin: auto
+        width: 100vw * math.div(30, 32)
+        min:
+          width: 960px
+          height: 100vh
+        font:
+          family: InterDisplay, sans-serif
+          feature-settings: 'tnum'
+          variant-alternates: styleset(disambiguation)
         color: #000
         background: #e6e6e6
         user-select: none
     :coffee
       String::toCapital1st = -> @charAt(0).toUpperCase() + @slice 1
 
-      # TODO: use `Webview`'s `select` bind to fetch JSON cache (fuck you, Fedora)
+      # TODO: use `Webview`'s `select` bind to fetch JSON cache
 
-      # for testing purposes only (fuck you again, Fedora)
+      # for testing purposes only (fuck you, Fedora)
       @data =
         alt: JSON.parse '[{"name":"Amazon Web Services","values":[{"name":"price","value":10},{"name":"memory","value":4},{"name":"storage","value":80},{"name":"uptime","value":100},{"name":"security","value":3}]},{"name":"Google Cloud Platform","values":[{"name":"price","value":15},{"name":"memory","value":8},{"name":"storage","value":160},{"name":"uptime","value":90},{"name":"security","value":2}]},{"name":"Microsoft Azure","values":[{"name":"price","value":20},{"name":"memory","value":16},{"name":"storage","value":200},{"name":"uptime","value":80},{"name":"security","value":3}]}]'
         criteria: JSON.parse '[{"name":"price","nameL10N":"Harga","type":"cost","weight":0.2},{"name":"memory","nameL10N":"Memori","type":"benefit","weight":0.2},{"name":"storage","nameL10N":"Penyimpanan","type":"benefit","weight":0.2},{"name":"uptime","nameL10N":"Ketersediaan","type":"benefit","weight":0.2},{"name":"security","nameL10N":"Keamanan","type":"benefit","weight":0.2}]'
@@ -258,7 +261,7 @@ html(lang="id", dir="ltr")
           tr.insideWeight
         tbody
     section#step2
-      h1 Vektor Pangkat
+      h1 Vektor
       table.content
         thead
           tr.insideName
@@ -268,11 +271,11 @@ html(lang="id", dir="ltr")
           tr.insideWeight
         tbody
     section#step3
-      h1 Vektor Banding
+      h1 Peringkat
       table.content
         thead
           th No.
           th Nama Alternatif
-          th Nilai Pangkat
+          th Jumlah Vektor
           th Peringkat
         tbody
