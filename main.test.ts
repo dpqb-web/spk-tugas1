@@ -1,8 +1,10 @@
 import { join } from "jsr:@std/path";
-import { exists } from "jsr:@std/fs";
+import { ensureDir, exists } from "jsr:@std/fs";
 
 import { PATH_CACHE } from "./main.ts";
 import { dataAlt, dataCriteria, nameTable } from "./db.json.d.ts";
+
+await ensureDir(PATH_CACHE);
 
 const tables: nameTable[] = ["alt", "criteria"];
 
