@@ -7,7 +7,6 @@ import * as db from "./db.json.ts";
 export const PATH_CACHE: string = resolve("cache");
 
 // NOTE TO SELF: never use Fedora again. can't even do good things. fuck it.
-// uncomment below if you didn't use it
 
 export const app: Webview = new Webview();
 
