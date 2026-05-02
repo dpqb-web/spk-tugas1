@@ -1,5 +1,5 @@
 doctype html
-html(lang="en", dir="ltr")
+html(lang="id", dir="ltr")
   head
     meta(charset="utf-8")
     meta(name="viewport", content="width=device-width, height=device-height, initial-scale=1")
@@ -10,6 +10,8 @@ html(lang="en", dir="ltr")
     meta(name="author", content=author)
     title=name
     :sass
+      @import 'https://rsms.me/inter/inter.css'
+
       // Reset //
 
       *
@@ -30,6 +32,7 @@ html(lang="en", dir="ltr")
         color: inherit
     :sass
       @use "sass:color"
+      @use "sass:math"
 
       /*  #000
           #1A1A1A
@@ -69,124 +72,207 @@ html(lang="en", dir="ltr")
       @for $i from 1 through 6
         h#{7 - $i}
           font:
-            size:  + (3 * $i)
+            size: 1 + math.div(1em, 7 - $i)
             weight: 400
           margin-block-end: 1rem
           line-height: 1.3
 
       // Isi //
+      html
+        font-size: math.div(13em, 16)
+
       body
-        display: flex
+        width: calc(100vw * (30/32))
+        min-width: 960px
         min-height: 100vh
-        font-family: Inter, sans-serif
+        font-family: InterDisplay, sans-serif
         font-feature-settings: 'tnum'
         font-variant-alternates: styleset(disambiguation)
         color: #000
         background: #e6e6e6
         user-select: none
-
-      main
-        max-width: 480px
-        margin: auto
-        width: 100%
-        display: flex
-        flex-flow: column nowrap
-        aspect-ratio: 1
-
-        .counter
-          font-size: 5em
-          margin: 10px
-          text-align: right
-          line-height: 1
-
-        .buttons
-          display: flex
-          flex-flow: row nowrap
-          flex: 1
-
-          > *
-            width: 50%
-
-          .smalls
-            display: flex
-            flex-flow: column nowrap
-
-            > *
-              height: 50%
-
-        button
-          border-radius: 10px
-          background: #ccc
-          margin: 10px
-
-          i
-            font-size: 4em
-            margin: auto
-
-      aside
-        position: absolute
-        top: 0
-        left: 0
-        z-index: 99
-
-        button
-          padding: 12px
-          border: 1px solid #7f7f7f
-          background: #1a1a1a
-
-          i
-            font-size: 2em
-
-      button
-        border: 1px solid #7f7f7f
-        &:active
-          filter: invert(100%)
-
-      .dialog
-        position: fixed
-        top: 0
-        left: 0
-        width: 100%
-        height: 100%
-        background: #0000007f
-        backdrop-filter: blur(5px)
-        z-index: 9999
-        display: flex
-
-        .box
-          max-width: 480px
-          margin: auto
-
-      i
-        &.bx, &.bxf, &.bxl
-          display: block
-
-      +dark
-        color: #fff
-        background: #1a1a1a
-
-        main button
-          background: #333
     :coffee
-      self.g =
-        vibrate: (ms) ->
-          if 'vibrate' of navigator
-            navigator.vibrate ms
+      String::toCapital1st = -> @charAt(0).toUpperCase() + @slice 1
+
+      # TODO: use `Webview`'s `select` bind to fetch JSON cache (fuck you, Fedora)
+
+      # for testing purposes only (fuck you again, Fedora)
+      @data =
+        alt: JSON.parse '[{"name":"Amazon Web Services","values":[{"name":"price","value":10},{"name":"memory","value":4},{"name":"storage","value":80},{"name":"uptime","value":100},{"name":"security","value":3}]},{"name":"Google Cloud Platform","values":[{"name":"price","value":15},{"name":"memory","value":8},{"name":"storage","value":160},{"name":"uptime","value":90},{"name":"security","value":2}]},{"name":"Microsoft Azure","values":[{"name":"price","value":20},{"name":"memory","value":16},{"name":"storage","value":200},{"name":"uptime","value":80},{"name":"security","value":3}]}]'
+        criteria: JSON.parse '[{"name":"price","nameL10N":"Harga","type":"cost","weight":0.2},{"name":"memory","nameL10N":"Memori","type":"benefit","weight":0.2},{"name":"storage","nameL10N":"Penyimpanan","type":"benefit","weight":0.2},{"name":"uptime","nameL10N":"Ketersediaan","type":"benefit","weight":0.2},{"name":"security","nameL10N":"Keamanan","type":"benefit","weight":0.2}]'
+    :coffee
+      document.addEventListener 'DOMContentLoaded', =>
+        for tbl in document.querySelectorAll 'table.content'
+          thName = tbl.querySelectorAll 'tr.insideName'
+          thType = tbl.querySelectorAll 'tr.insideType'
+          thWght = tbl.querySelectorAll 'tr.insideWeight'
+
+          for crit in @data.criteria
+            name = document.createElement 'th'
+            name.textContent = crit.nameL10N
+            x.appendChild name for x in thName
+
+            type = document.createElement 'th'
+            type.textContent = crit.type.toCapital1st()
+            x.appendChild type for x in thType
+
+            wght = document.createElement 'th'
+            wght.textContent = crit.weight * 100 + '%'
+            x.appendChild wght for x in thWght
+    :coffee
+      document.addEventListener 'DOMContentLoaded', =>
+        tblContent = document.querySelector '#step1 table.content tbody'
+
+        thAct = document.createElement 'th'
+        thAct.rowSpan = 3
+        thAct.textContent = 'Tindakan'
+        document.querySelector '#step1 .insideName'
+        .appendChild thAct
+
+        for alt, i in @data.alt
+          if alt.values.length is @data.criteria.length
+            last = 0
+
+            row = document.createElement 'tr'
+            row.dataset.name = alt.name
+
+            cols = (document.createElement 'td' for _ in [0..(@data.criteria.length + 2)])
+
+            cols[0].textContent = i + 1
+
+            do ->
+              name = document.createElement 'span'
+              name.textContent = alt.name
+              cols[1].appendChild name
+
+              input = document.createElement 'input'
+              input.hidden = true
+              input.name = 'name'
+              input.value = alt.name
+              cols[1].appendChild input
+
+            for x, y in alt.values
+              last = y + 2
+
+              value = document.createElement 'span'
+              value.textContent = x.value
+              cols[last].appendChild value
+
+              input = document.createElement 'input'
+              input.hidden = true
+              input.type = 'number'
+              input.name = x.name
+              input.value = x.value
+              cols[last].appendChild input
+
+            do ->
+              grpAct = document.createElement 'div'
+              grpAct.dataset.act = 'init'
+              buttonEditStart = document.createElement 'button'
+              buttonEditStart.name = 'alt-edit-start'
+              buttonEditStart.textContent = 'Sunting'
+              buttonDelStart = document.createElement 'button'
+              buttonDelStart.name = 'alt-del-start'
+              buttonDelStart.textContent = 'Hapus'
+              grpAct.appendChild x for x in [buttonEditStart, buttonDelStart]
+
+              grpEdit = document.createElement 'div'
+              grpEdit.dataset.act = 'edit'
+              grpEdit.hidden = true
+              buttonEditAccept = document.createElement 'button'
+              buttonEditAccept.name = 'alt-edit-accept'
+              buttonEditAccept.textContent = 'Simpan'
+              buttonEditCancel = document.createElement 'button'
+              buttonEditCancel.name = 'alt-edit-cancel'
+              buttonEditCancel.textContent = 'Batal'
+              grpEdit.appendChild x for x in [buttonEditAccept, buttonEditCancel]
+
+              grpDel = document.createElement 'div'
+              grpDel.dataset.act = 'del'
+              grpDel.hidden = true
+              buttonDelAccept = document.createElement 'button'
+              buttonDelAccept.name = 'alt-del-accept'
+              buttonDelAccept.textContent = 'Hapus'
+              buttonDelCancel = document.createElement 'button'
+              buttonDelCancel.name = 'alt-del-cancel'
+              buttonDelCancel.textContent = 'Batal'
+              grpDel.appendChild x for x in [buttonDelAccept, buttonDelCancel]
+
+              cols[last + 1].appendChild x for x in [grpAct, grpEdit, grpDel]
+
+            row.appendChild col for col in cols
+            tblContent.appendChild row
+    :coffee
+      document.addEventListener 'DOMContentLoaded', =>
+        tblContent = document.querySelector '#step2 table.content tbody'
+        for alt, i in @data.alt
+          if alt.values.length is @data.criteria.length
+            row = document.createElement 'tr'
+
+            cols = (document.createElement 'td' for _ in [0..(@data.criteria.length + 2)])
+
+            cols[0].textContent = i + 1
+            cols[1].textContent = alt.name
+
+            # TODO: do the matrix scores thing
+
+            row.appendChild col for col in cols
+            tblContent.appendChild row
+    :coffee
+      document.addEventListener 'DOMContentLoaded', =>
+        tblContent = document.querySelector '#step3 table.content tbody'
+        for alt, i in @data.alt
+          if alt.values.length is @data.criteria.length
+            row = document.createElement 'tr'
+
+            cols = (document.createElement 'td' for _ in [0..(@data.criteria.length + 2)])
+
+            cols[0].textContent = i + 1
+            cols[1].textContent = alt.name
+
+            # TODO: normalize the matrix and rank it
+
+            row.appendChild col for col in cols
+            tblContent.appendChild row
+
+        trSum = document.createElement 'tr'
+        tdSum = document.createElement 'td'
+        tdSum.colSpan = 2
+        tdSum.textContent = 'Jumlah'
+        tblContent.appendChild trSum.appendChild tdSum
+    :coffee
+      # TODO: add the function to add, edit, remove alternative; and update the tables everytime. use `Webview`'s binds to save it to JSON cache
   body
-    table
-      thead
-        tr
-          th(rowspan='2') No.
-          th(rowspan='2') Nama Alternatif
-          th Harga
-          th Jangka ketersediaan
-          th Tingkat keamanan
-          th Kapasitas RAM
-          th Kapasitas penyimpanan
-        tr
-          th Cost
-          th Benefit
-          th Benefit
-          th Benefit
-          th Benefit
-      tbody
+    section#step1
+      h1 Data Alternatif
+      table: tbody: tr
+        td: button(name='alt-add-start') Tambah Alternatif
+        // SOON!
+        td: button(name='criteria-modify-start', hidden) Ubah Kriteria
+      table.content
+        thead
+          tr.insideName
+            th(rowspan='3') No.
+            th(rowspan='3') Nama Alternatif
+          tr.insideType
+          tr.insideWeight
+        tbody
+    section#step2
+      h1 Vektor Pangkat
+      table.content
+        thead
+          tr.insideName
+            th(rowspan='3') No.
+            th(rowspan='3') Nama Alternatif
+          tr.insideType
+          tr.insideWeight
+        tbody
+    section#step3
+      h1 Vektor Banding
+      table.content
+        thead
+          th No.
+          th Nama Alternatif
+          th Nilai Pangkat
+          th Peringkat
+        tbody
