@@ -1,8 +1,7 @@
-import { join } from "jsr:@std/path";
+import { join, resolve } from "jsr:@std/path";
 import { ensureDir } from "jsr:@std/fs";
 
-import { PATH_CACHE } from "./main.ts";
-
+const PATH_CACHE: string = resolve("cache");
 await ensureDir(PATH_CACHE);
 
 const write = async (table: string, data: object[]): Promise<void> =>

@@ -1,10 +1,7 @@
-import { resolve } from "jsr:@std/path";
 import { Webview } from "jsr:@webview/webview";
 
 import { renderSPA } from "./template.ts";
 import * as db from "./db.json.ts";
-
-export const PATH_CACHE: string = resolve("cache");
 
 // NOTE TO SELF: never use Fedora again. can't even do good things. fuck it.
 
