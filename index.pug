@@ -1,3 +1,6 @@
+- const name = names[0] + ' - ' + names[1];
+- const description = `Aplikasi ${names[0]} bertema ${names[1]}`;
+
 doctype html
 html(lang="id", dir="ltr")
   head
@@ -24,15 +27,15 @@ html(lang="id", dir="ltr")
       [hidden]
         display: none !important
 
-      input, button, textarea
+      input, textarea, button, select
         background: inherit
         font: inherit
         color: inherit
+    style.
+      @font-face{font-family:InterVariable;font-style:normal;font-weight:100 900;font-display:swap;src:url('data:font/woff2;base64,#{fonts[0]}') format('woff2')}@font-face{font-family:InterVariable;font-style:italic;font-weight:100 900;font-display:swap;src:url('data:font/woff2;base64,#{fonts[1]}') format('woff2')}@font-feature-values InterVariable{@character-variant{cv01:1;cv02:2;cv03:3;cv04:4;cv05:5;cv06:6;cv07:7;cv08:8;cv09:9;cv10:10;cv11:11;cv12:12;cv13:13;alt-1:1;alt-3:9;open-4:2;open-6:3;open-9:4;lc-l-with-tail:5;simplified-u:6;alt-double-s:7;uc-i-with-serif:8;uc-g-with-spur:10;single-story-a:11;compact-lc-f:12;compact-lc-t:13}@styleset{ss01:1;ss02:2;ss03:3;ss04:4;ss05:5;ss06:6;ss07:7;ss08:8;open-digits:1;disambiguation:2;disambiguation-except-zero:4;round-quotes-and-commas:3;square-punctuation:7;square-quotes:8;circled-characters:5;squared-characters:6}}
     :sass
       @use "sass:color"
       @use "sass:math"
-      
-      @import 'https://rsms.me/inter/inter.css'
 
       /*  #000
           #1A1A1A
@@ -72,10 +75,10 @@ html(lang="id", dir="ltr")
       @for $i from 1 through 6
         h#{7 - $i}
           font:
-            size: 1 + math.div(1em, 7 - $i)
-            weight: 400
+            size: 1em + math.div($i - 1, 5)
+            weight: 300
           margin-block-end: 1rem
-          line-height: 1.3
+          line-height: 1.5
 
       // Isi //
       html
@@ -83,20 +86,65 @@ html(lang="id", dir="ltr")
 
       body
         margin: auto
-        width: 100vw * math.div(30, 32)
+        width: calc(100vw * (30 / 32))
         min:
-          width: 960px
+          width: 480px
           height: 100vh
         font:
-          family: InterDisplay, sans-serif
+          family: InterVariable, sans-serif
           feature-settings: 'tnum'
+          variation-settings: 'opsz' 32
           variant-alternates: styleset(disambiguation)
+        line-height: 1.3
         color: #000
         background: #e6e6e6
         user-select: none
+
+      input, textarea, button, select
+        border: 1px solid #1A1A1A
+        border-radius: 5px
+        padding: 3px 5px
+        
+      input, textarea
+        background: #FFF
+        &:focus
+          border-color: #1a7fe6
+
+      button, select
+        background: #CCC
+        &:active
+          filter: invert(1)
+
+      section
+        margin: calc(100vw * (30 / 32) * (1 / 12) * (1 / 8))
+
+      h1
+        margin: calc(100vw * (30 / 32) * (1 / 12) * (1 / 8))
+
+      table
+        width: 100%
+        border-collapse: collapse
+        
+        th, td
+          padding: 0.5em
+          border: 1px solid #7F7F7F
+
+        input
+          width: 100%
+
+      // Khusus //
+      .actStep1
+        margin-bottom: 1rem
+
+      td [class^="acts"]
+        display: flex
+        flex-flow: row nowrap
+        gap: 5px
     :coffee
       String::toCapital1st = -> @charAt(0).toUpperCase() + @slice 1
 
+      document.addEventListener 'contextmenu', (e) -> e.preventDefault()
+    :coffee
       # TEMP: can't use it rn cuz fuck Fedora
       # @data =
       #   alt: select 'alt'
@@ -108,7 +156,7 @@ html(lang="id", dir="ltr")
         criteria: JSON.parse '[{"name":"price","nameL10N":"Harga","type":"cost","weight":0.2},{"name":"memory","nameL10N":"Memori","type":"benefit","weight":0.2},{"name":"storage","nameL10N":"Penyimpanan","type":"benefit","weight":0.2},{"name":"uptime","nameL10N":"Ketersediaan","type":"benefit","weight":0.2},{"name":"security","nameL10N":"Keamanan","type":"benefit","weight":0.2}]'
     :coffee
       document.addEventListener 'DOMContentLoaded', =>
-        for tbl in document.querySelectorAll 'table.content'
+        for tbl in document.querySelectorAll 'table'
           thName = tbl.querySelectorAll 'tr.insideName'
           thType = tbl.querySelectorAll 'tr.insideType'
           thWght = tbl.querySelectorAll 'tr.insideWeight'
@@ -127,7 +175,7 @@ html(lang="id", dir="ltr")
             x.appendChild wght for x in thWght
     :coffee
       document.addEventListener 'DOMContentLoaded', =>
-        tblContent = document.querySelector '#step1 table.content tbody'
+        tblContent = document.querySelector '#step1 table tbody'
 
         thAct = document.createElement 'th'
         thAct.rowSpan = 3
@@ -142,7 +190,7 @@ html(lang="id", dir="ltr")
             row = document.createElement 'tr'
             row.dataset.name = alt.name
 
-            cols = (document.createElement 'td' for _ in [0..(@data.criteria.length + 2)])
+            cols = (document.createElement 'td' for _ in [1..(@data.criteria.length + 3)])
 
             cols[0].textContent = i + 1
 
@@ -169,53 +217,22 @@ html(lang="id", dir="ltr")
               input.type = 'number'
               input.name = x.name
               input.value = x.value
+              input.min = 0
               cols[last].appendChild input
 
-            do ->
-              grpAct = document.createElement 'div'
-              grpAct.dataset.act = 'init'
-              buttonEditStart = document.createElement 'button'
-              buttonEditStart.name = 'alt-edit-start'
-              buttonEditStart.textContent = 'Sunting'
-              buttonDelStart = document.createElement 'button'
-              buttonDelStart.name = 'alt-del-start'
-              buttonDelStart.textContent = 'Hapus'
-              grpAct.appendChild x for x in [buttonEditStart, buttonDelStart]
-
-              grpEdit = document.createElement 'div'
-              grpEdit.dataset.act = 'edit'
-              grpEdit.hidden = true
-              buttonEditAccept = document.createElement 'button'
-              buttonEditAccept.name = 'alt-edit-accept'
-              buttonEditAccept.textContent = 'Simpan'
-              buttonEditCancel = document.createElement 'button'
-              buttonEditCancel.name = 'alt-edit-cancel'
-              buttonEditCancel.textContent = 'Batal'
-              grpEdit.appendChild x for x in [buttonEditAccept, buttonEditCancel]
-
-              grpDel = document.createElement 'div'
-              grpDel.dataset.act = 'del'
-              grpDel.hidden = true
-              buttonDelAccept = document.createElement 'button'
-              buttonDelAccept.name = 'alt-del-accept'
-              buttonDelAccept.textContent = 'Hapus'
-              buttonDelCancel = document.createElement 'button'
-              buttonDelCancel.name = 'alt-del-cancel'
-              buttonDelCancel.textContent = 'Batal'
-              grpDel.appendChild x for x in [buttonDelAccept, buttonDelCancel]
-
-              cols[last + 1].appendChild x for x in [grpAct, grpEdit, grpDel]
+            acts = document.querySelector '.DOM .altActs'
+            cols[last + 1].innerHTML = acts.innerHTML
 
             row.appendChild col for col in cols
             tblContent.appendChild row
     :coffee
       document.addEventListener 'DOMContentLoaded', =>
-        tblContent = document.querySelector '#step2 table.content tbody'
+        tblContent = document.querySelector '#step2 table tbody'
         for alt, i in @data.alt
           if alt.values.length is @data.criteria.length
             row = document.createElement 'tr'
 
-            cols = (document.createElement 'td' for _ in [0..(@data.criteria.length + 2)])
+            cols = (document.createElement 'td' for _ in [1..(@data.criteria.length + 2)])
 
             cols[0].textContent = i + 1
             cols[1].textContent = alt.name
@@ -226,12 +243,12 @@ html(lang="id", dir="ltr")
             tblContent.appendChild row
     :coffee
       document.addEventListener 'DOMContentLoaded', =>
-        tblContent = document.querySelector '#step3 table.content tbody'
+        tblContent = document.querySelector '#step3 table tbody'
         for alt, i in @data.alt
           if alt.values.length is @data.criteria.length
             row = document.createElement 'tr'
 
-            cols = (document.createElement 'td' for _ in [0..(@data.criteria.length + 2)])
+            cols = (document.createElement 'td' for _ in [1..4])
 
             cols[0].textContent = i + 1
             cols[1].textContent = alt.name
@@ -249,13 +266,14 @@ html(lang="id", dir="ltr")
     :coffee
       # TODO: add the function to add, edit, remove alternative; and update the tables everytime. use `Webview`'s binds to save it to JSON cache
   body
+    h1=names[1]
     section#step1
-      h1 Data Alternatif
-      table: tbody: tr
-        td: button(name='alt-add-start') Tambah Alternatif
+      h2 Data Alternatif
+      .actStep1
+        button(name='alt-add-start') Tambah Alternatif
         // SOON!
-        td: button(name='criteria-modify-start', hidden) Ubah Kriteria
-      table.content
+        button(name='criteria-modify-start', hidden) Ubah Kriteria
+      table
         thead
           tr.insideName
             th(rowspan='3') No.
@@ -264,8 +282,8 @@ html(lang="id", dir="ltr")
           tr.insideWeight
         tbody
     section#step2
-      h1 Vektor
-      table.content
+      h2 Vektor
+      table
         thead
           tr.insideName
             th(rowspan='3') No.
@@ -274,11 +292,22 @@ html(lang="id", dir="ltr")
           tr.insideWeight
         tbody
     section#step3
-      h1 Peringkat
-      table.content
+      h2 Peringkat
+      table
         thead
           th No.
           th Nama Alternatif
           th Jumlah Vektor
           th Peringkat
         tbody
+    .DOM(hidden)
+      .altActs
+        .actsInit
+          button(name='alt-edit-start') Sunting
+          button.red(name='alt-del-start') Hapus
+        .actsEdit(hidden)
+          button.green(name='alt-edit-accept') Simpan
+          button.red(name='alt-edit-cancel') Batal
+        .actsDel(hidden)
+          button.red(name='alt-del-accept') Hapus
+          button(name='alt-del-cancel') Batal

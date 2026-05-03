@@ -1,4 +1,5 @@
 import { resolve } from "jsr:@std/path";
+import { encodeBase64 } from "jsr:@std/encoding";
 
 import {
   compileFile as compileFilePug,
@@ -10,6 +11,12 @@ import {
 } from "npm:sass";
 import { compile as compileCoffee } from "npm:coffeescript";
 import { minify_sync, MinifyOutput } from "npm:terser";
+
+export const fetchBase64 = async (url: string): Promise<string> => {
+  const response: Response = await fetch(url);
+  const data: ArrayBuffer = await response.arrayBuffer();
+  return encodeBase64(data);
+};
 
 export const renderSPA = (locals?: object): string => {
   const tmp: compileTemplatePug = compileFilePug(resolve("index.pug"), {

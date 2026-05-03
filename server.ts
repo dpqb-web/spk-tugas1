@@ -1,13 +1,22 @@
-import { renderSPA } from "./template.ts";
+import { fetchBase64, renderSPA } from "./template.ts";
+
+const fonts: string[] = [
+  await fetchBase64("http://rsms.me/inter/font-files/InterVariable.woff2"),
+  await fetchBase64(
+    "http://rsms.me/inter/font-files/InterVariable-Italic.woff2",
+  ),
+];
 
 export default {
   fetch(_req: Request): Response {
     return new Response(
       renderSPA({
-        name: "Sistem Pendukung Keputusan - Pemilihan Penyedia Layanan Cloud",
-        description:
-          "Aplikasi Sistem Pendukung Keputusan bertema Pemilihan Penyedia Layanan Cloud",
+        names: [
+          "Sistem Pendukung Keputusan",
+          "Pemilihan Penyedia Layanan Cloud",
+        ],
         author: "Muhammad Rizki Fauzan",
+        fonts,
       }),
       {
         headers: { "content-type": "text/html" },
