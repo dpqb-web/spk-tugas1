@@ -81,12 +81,16 @@ html(lang="id", dir="ltr")
           line-height: 1.5
 
       // Isi //
+      $w960: math.div(30, 32)
+      $w80: $w960 * math.div(1, 12)
+      $w10: $w80 * math.div(1, 8)
+      
       html
         font-size: math.div(13em, 16)
 
       body
         margin: auto
-        width: calc(100vw * (30 / 32))
+        width: 100vw * $w960
         min:
           width: 480px
           height: 100vh
@@ -116,10 +120,10 @@ html(lang="id", dir="ltr")
           filter: invert(1)
 
       section
-        margin: calc(100vw * (30 / 32) * (1 / 12) * (1 / 8))
+        margin: 100vw * $w10
 
       h1
-        margin: calc(100vw * (30 / 32) * (1 / 12) * (1 / 8))
+        margin: 100vw * $w10
 
       table
         width: 100%
