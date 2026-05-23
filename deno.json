@@ -1,7 +1,0 @@
-{
-    "tasks": {
-        "html": "deno r pug.ts",
-        "css": "deno x sass",
-        "js": "deno x coffee"
-    }
-}

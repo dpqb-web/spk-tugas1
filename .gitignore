@@ -3,7 +3,7 @@ deno.lock
 go.sum
 
 db.sqlite
-templates/index.bak.html
+templates
 public/commit
 public/inter
 
