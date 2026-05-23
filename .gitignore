@@ -1,10 +1,9 @@
-vendor
-deno.lock
-go.sum
+__pycache__
+venv
+*.lock
 
 db.sqlite
-templates
-public/commit
-public/inter
-
-spk
+views
+templates/index.bak.html
+static/commit
+static/inter

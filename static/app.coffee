@@ -228,7 +228,7 @@ renderPenilaian = ->
 
   head.innerHTML = "<tr><th>Kode</th><th>Nama Penyedia</th>" +
     _kriteria.map((k) -> """
-      <th title="#{k.nama}" style="cursor:help">#{k.kode}<br><small class="penilaian-small">#{k.tipe}</small></th>
+      <th title="#{k.nama}">#{k.kode}<br><small style="color:var(--muted);font-size:10px">#{k.tipe}</small></th>
     """).join("") + "</tr>"
 
   body.innerHTML = _alternatif.map((a) ->
@@ -276,7 +276,7 @@ renderPerhitungan = ->
     """
   ).join("") +
   """
-    <tr class="perhitungan-tr">
+    <tr style="font-weight:700;background:var(--surface)">
       <td colspan="3">TOTAL</td><td>#{totalB.toFixed(4)}</td><td>#{totalN.toFixed(4)}</td>
     </tr>
   """
@@ -294,7 +294,7 @@ renderPerhitungan = ->
     _kriteria.map((k) ->
       norm = _norm.find (n) -> n.kode is k.kode
       pangkat = if norm then (if k.tipe is "Cost" then -norm.bobot_norm else norm.bobot_norm).toFixed(4) else "–"
-      "<th>#{k.kode}<br><small class=\"perhitungan-small\">(#{pangkat})</small></th>"
+      "<th>#{k.kode}<br><small style=\"color:var(--accent);font-size:10px\">(#{pangkat})</small></th>"
     ).join("") + "<th>Nilai S</th></tr>"
 
   vsTbody.innerHTML = _hasil.map((h) ->
@@ -328,14 +328,14 @@ renderHasil = ->
     document.getElementById("rekomendasi-content").innerHTML = """
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
       <div>
-        <div class="hasil-div1">Rekomendasi Terbaik</div>
-        <div class="hasil-div2">#{best.nama}</div>
-        <div class="hasil-div3">
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Rekomendasi Terbaik</div>
+        <div style="font-size:22px;font-weight:700;color:var(--rank1)">#{best.nama}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">
           Kode: <b>#{best.alternatif_kode}</b> &nbsp;|&nbsp;
-          Nilai V: <b class="hasil-b-all">#{best.vektor_v.toFixed(6)}</b> &nbsp;|&nbsp;
+          Nilai V: <b style="color:var(--green)">#{best.vektor_v.toFixed(6)}</b> &nbsp;|&nbsp;
           Nilai S: <b>#{best.vektor_s.toFixed(6)}</b>
         </div>
-        <div class="hasil-div4">
+        <div style="font-size:12px;color:var(--muted);margin-top:8px;">
           Penyedia ini memiliki nilai Vektor V tertinggi berdasarkan metode Weighted Product,
           dengan mempertimbangkan #{_kriteria.length} kriteria dan #{_alternatif.length} alternatif.
         </div>
@@ -353,7 +353,7 @@ renderHasil = ->
       <td><b>#{h.alternatif_kode}</b></td>
       <td>#{h.nama}</td>
       <td>#{h.vektor_s.toFixed(6)}</td>
-      <td><b class="#{if h.ranking is 1 then 'hasil-b-rank' else 'hasil-b-remain'}">#{h.vektor_v.toFixed(6)}</b></td>
+      <td><b style="color:#{if h.ranking is 1 then 'var(--rank1)' else 'var(--text)'}">#{h.vektor_v.toFixed(6)}</b></td>
       <td>
         <div class="progress-bar"><div class="progress-fill" style="width:#{pct}%"></div></div>
         #{pct}%
@@ -380,7 +380,3 @@ for x in document.querySelectorAll '.tab[data-tab]'
     showTab e, @dataset.tab
 
 loadPage "dashboard"
-
-document.addEventListener 'contextmenu', (e) ->
-  e.preventDefault()
-  return false
