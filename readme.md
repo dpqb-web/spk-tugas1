@@ -1,103 +1,80 @@
 # SPK Pemilihan Cloud Provider
 ### Sistem Pendukung Keputusan – Metode Weighted Product (WP)
 
-Aplikasi web standalone berbasis **Python + Flask + SQLite + pywebview** untuk membantu pengambilan keputusan pemilihan penyedia layanan cloud menggunakan metode **Weighted Product**.
+Aplikasi desktop standalone berbasis **Go + SQLite + WebView** untuk membantu pengambilan keputusan pemilihan penyedia layanan cloud menggunakan metode **Weighted Product**.
 
 ---
 
-## 📦 Struktur Proyek
+## Struktur Proyek
 
 ```
-spk_cloud/
-├── app.py              # Entry point: Flask routes + pywebview launcher
-├── db.py               # Inisialisasi & helper SQLite
-├── spk_cloud.db        # Database SQLite (dibuat otomatis saat pertama jalan)
-├── requirements.txt    # Dependensi Python
-├── templates/
-│   └── index.html      # UI lengkap (Single Page App)
-└── README.md
+spk/
+├── main.go              # Entry point: HTTP server + WebView launcher
+├── db.go                # Inisialisasi SQLite, model struct, seed data
+├── handlers.go          # HTTP handlers & logika WP
+├── public/              # Frontend (embedded via embed.FS)
+│   ├── index.html       # SPA utama (dikompilasi dari Pug)
+│   ├── app.js           # Logic frontend (dikompilasi dari CoffeeScript)
+│   ├── style.css        # Styling (dikompilasi dari Sass)
+├── templates/           # Source Pug (pre-build)
+├── go.mod / go.sum      # Dependensi Go
+├── db.sqlite            # Database SQLite (dibuat otomatis saat pertama jalan)
+└── readme.md            # Catatan ini
 ```
 
 ---
 
-## 🚀 Cara Menjalankan
+## Cara Menjalankan
 
-### 1. Pastikan Python 3.9+ sudah terpasang
+### 1. Pastikan Go 1.21+ sudah terpasang
 
 ```bash
-python --version
-# Python 3.9.x atau lebih baru
+go version
 ```
 
-### 2. Buat virtual environment (opsional tapi direkomendasikan)
+### 2. Clone & build
 
 ```bash
-python -m venv venv
-
-# Aktivasi di Windows:
-venv\Scripts\activate
-
-# Aktivasi di macOS/Linux:
-source venv/bin/activate
+git clone https://github.com/dpqb-web/spk-tugas1.git
+cd spk
+go build -o spk
 ```
 
-### 3. Install dependensi
+**Untuk Windows** (sembunyikan jendela terminal):
 
 ```bash
-pip install -r requirements.txt
+go build -ldflags="-H windowsgui" -o spk.exe
 ```
 
-> **Catatan untuk Linux:** pywebview membutuhkan WebKit2GTK. Install dengan:
-> ```bash
-> # Ubuntu/Debian:
-> sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-webkit2-4.0
->
-> # Fedora/RHEL:
-> sudo dnf install python3-gobject webkit2gtk3
-> ```
-
-### 4. Jalankan aplikasi
+### 3. Jalankan
 
 ```bash
-cd spk_cloud
-python app.py
+./spk
+# atau di Windows:
+spk.exe
 ```
 
 Jendela desktop akan terbuka otomatis menampilkan aplikasi.
+Database `db.sqlite` akan dibuat dan diisi data contoh saat pertama kali dijalankan.
 
 ---
 
-## 🌐 Akses via Browser (mode Flask saja, tanpa pywebview)
+## Database
 
-Jika ingin akses lewat browser biasa tanpa jendela desktop:
+Database SQLite (`db.sqlite`) dibuat otomatis saat pertama kali aplikasi dijalankan.
+Data awal langsung dimasukkan melalui fungsi `seed()` di `db.go`:
 
-```bash
-# Edit app.py bagian bawah:
-# Ganti webview.start() menjadi:
-app.run(host='127.0.0.1', port=5050, debug=True)
-
-# Lalu buka browser ke:
-http://127.0.0.1:5050
-```
-
----
-
-## 🗄️ Database
-
-Database SQLite (`spk_cloud.db`) dibuat otomatis pada saat pertama kali aplikasi dijalankan.  
-Data awal (seed) dari file Excel langsung dimasukkan ke database:
-
-| Tabel            | Keterangan                                 |
-|------------------|--------------------------------------------|
-| `kriteria`       | 10 kriteria penilaian beserta bobot & tipe |
-| `alternatif`     | 6 penyedia cloud                           |
-| `penilaian`      | Nilai tiap alternatif terhadap tiap kriteria |
-| `vektor_s_detail`| Detail perhitungan komponen Vektor S       |
-| `hasil`          | Hasil akhir: Vektor S, V, dan Ranking      |
+| Tabel              | Keterangan                                 |
+|--------------------|--------------------------------------------|
+| `kriteria`         | 10 kriteria penilaian beserta bobot & tipe |
+| `alternatif`       | 6 penyedia cloud                           |
+| `penilaian`        | Nilai tiap alternatif terhadap tiap kriteria |
+| `vektor_s_detail`  | Detail perhitungan komponen Vektor S       |
+| `hasil`            | Hasil akhir: Vektor S, V, dan Ranking      |
 
 ---
 
-## 📊 Fitur Aplikasi
+## Fitur Aplikasi
 
 | Halaman       | Fitur                                                              |
 |---------------|--------------------------------------------------------------------|
@@ -110,7 +87,7 @@ Data awal (seed) dari file Excel langsung dimasukkan ke database:
 
 ---
 
-## ⚙️ Metode: Weighted Product (WP)
+## Metode: Weighted Product (WP)
 
 ```
 1. Normalisasi Bobot  →  W*j = Wj / ΣWj
@@ -125,12 +102,22 @@ Data awal (seed) dari file Excel langsung dimasukkan ke database:
 
 ---
 
-## 🔧 Troubleshooting
+## Build Catatan
+
+| Platform   | Perintah                                |
+|------------|-----------------------------------------|
+| Linux      | `go build -o spk`                      |
+| macOS      | `go build -o spk`                      |
+| Windows    | `go build -ldflags="-H windowsgui" -o spk.exe` |
+
+---
+
+## Troubleshooting
 
 | Masalah                          | Solusi                                              |
 |----------------------------------|-----------------------------------------------------|
-| `ModuleNotFoundError: webview`   | `pip install pywebview`                             |
-| `ModuleNotFoundError: flask`     | `pip install flask`                                 |
-| Jendela tidak muncul (Linux)     | Install WebKit2GTK (lihat langkah 3 di atas)       |
-| Port 5050 sudah dipakai          | Ganti port di `app.py` baris `port=5050`           |
-| Database corrupt                 | Hapus `spk_cloud.db`, jalankan ulang app           |
+| `undefined: webview.New`         | Pastikan `go mod tidy` sudah dijalankan             |
+| Database corrupt                 | Hapus `db.sqlite`, jalankan ulang aplikasi          |
+| Port sudah dipakai               | Program otomatis memilih port kosong (`:0`)         |
+| WebView tidak muncul (Linux)     | Install WebKit2GTK: `sudo apt install libwebkit2gtk-4.1-dev` |
+| WebView tidak muncul (macOS)     | Pastikan Xcode Command Line Tools terinstall        |
