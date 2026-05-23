@@ -1,0 +1,509 @@
+- const name = names[0] + ' - ' + names[1];
+- const description = `Aplikasi ${names[0]} bertema ${names[1]}`;
+
+doctype html
+html(lang="id")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, height=device-height, initial-scale=1")
+    meta(name="X-UA-Compatible", content="IE=edge")
+    meta(name="application-name", content=names[0])
+    meta(name="description", content=description)
+    meta(name="generator", content="deno, coffee, pug, sass")
+    meta(name="author", content=author)
+    title=names[1]
+    style.
+      @font-face{font-family:InterVariable;font-style:normal;font-weight:100 900;font-display:swap;src:url('data:font/woff2;base64,#{fonts[0]}') format('woff2')}@font-face{font-family:InterVariable;font-style:italic;font-weight:100 900;font-display:swap;src:url('data:font/woff2;base64,#{fonts[1]}') format('woff2')}@font-feature-values InterVariable{@character-variant{cv01:1;cv02:2;cv03:3;cv04:4;cv05:5;cv06:6;cv07:7;cv08:8;cv09:9;cv10:10;cv11:11;cv12:12;cv13:13;alt-1:1;alt-3:9;open-4:2;open-6:3;open-9:4;lc-l-with-tail:5;simplified-u:6;alt-double-s:7;uc-i-with-serif:8;uc-g-with-spur:10;single-story-a:11;compact-lc-f:12;compact-lc-t:13}@styleset{ss01:1;ss02:2;ss03:3;ss04:4;ss05:5;ss06:6;ss07:7;ss08:8;open-digits:1;disambiguation:2;disambiguation-except-zero:4;round-quotes-and-commas:3;square-punctuation:7;square-quotes:8;circled-characters:5;squared-characters:6}}
+    style!=style
+  body
+    .layout
+      //- Sidebar
+      .sidebar
+        nav.nav
+          .nav-item.active(onclick="showPage('dashboard')")
+            span Dashboard
+          .nav-item(onclick="showPage('kriteria')")
+            span Kriteria
+          .nav-item(onclick="showPage('alternatif')")
+            span Alternatif
+          .nav-item(onclick="showPage('penilaian')")
+            span Penilaian
+          .nav-item(onclick="showPage('perhitungan')")
+            span Perhitungan
+          .nav-item(onclick="showPage('hasil')")
+            span Hasil
+
+      //- Main content
+      .main
+        //- DASHBOARD
+        #page-dashboard.page.active
+          .page-header
+            h1 Dashboard
+            p Sistem Pendukung Keputusan Pemilihan Cloud – Metode WP
+          .stats-grid#stats-grid
+            .stat-card
+              .stat-label Total Kriteria
+              .stat-value#stat-kriteria –
+              .stat-sub Kriteria penilaian
+            .stat-card
+              .stat-label Total Alternatif
+              .stat-value#stat-alternatif –
+              .stat-sub Penyedia cloud
+            .stat-card
+              .stat-label Terbaik
+              .stat-value#stat-terbaik(style="font-size:14px;margin-top:8px;") –
+              .stat-sub#stat-terbaik-v –
+            .stat-card
+              .stat-label Metode
+              .stat-value(style="font-size:16px;margin-top:8px;") WP
+              .stat-sub Weighted Product
+          .card
+            .card-header
+              h3 Ranking Penyedia Cloud
+            .card-body
+              #ranking-grid.ranking-grid Loading...
+
+        //- KRITERIA
+        #page-kriteria.page
+          .page-header
+            h1 Manajemen Kriteria
+            p Kelola kriteria dan bobot penilaian
+          .card
+            .card-header
+              h3 Tambah Kriteria
+            .card-body
+              .form-grid
+                .form-group
+                  label Kode
+                  input#k-kode(placeholder="C11" maxlength="5")
+                .form-group
+                  label Nama Kriteria
+                  input#k-nama(placeholder="Nama kriteria")
+                .form-group
+                  label Tipe
+                  select#k-tipe
+                    option(value="Benefit") Benefit (↑ lebih baik)
+                    option(value="Cost") Cost (↓ lebih baik)
+                .form-group
+                  label Bobot (0–1)
+                  input#k-bobot(type="number" placeholder="0.10" step="0.01")
+              div(style="margin-top:14px;")
+                button.btn.btn-primary(onclick="addKriteria()") Tambah Kriteria
+          .card
+            .card-header
+              h3 Daftar Kriteria
+              span#total-bobot-badge.badge
+            div(style="overflow-x:auto;")
+              table
+                thead
+                  tr
+                    th Kode
+                    th Nama
+                    th Tipe
+                    th Bobot
+                    th Bobot Norm.
+                    th Aksi
+                tbody#kriteria-tbody
+
+        //- PENILAIAN & PERHITUNGAN (Disederhanakan untuk contoh)
+        #page-penilaian.page
+          .page-header
+            h1 Data Penilaian
+            p Input nilai skala 1–10
+          .card
+            .card-header
+              h3 Matriks Penilaian
+              button.btn.btn-primary.btn-sm(onclick="savePenilaian()") Simpan Semua
+            div(style="overflow-x:auto;")
+              table#penilaian-table
+                thead#penilaian-head
+                tbody#penilaian-body
+
+        #page-perhitungan.page
+          .page-header
+            h1 Detail Perhitungan WP
+          .tabs
+            .tab.active(onclick="showTab(this,'tab-normalisasi')") 1. Normalisasi
+            .tab(onclick="showTab(this,'tab-vektors')") 2. Vektor S
+            .tab(onclick="showTab(this,'tab-vektorv')") 3. Vektor V
+          #tab-normalisasi
+            .formula-box W*j = Wj / Σ Wj
+            .card: div(style="overflow-x:auto;")
+              table
+                thead: tr: th Kode: th Kriteria: th Tipe: th Bobot: th Bobot Norm.
+                tbody#norm-tbody
+
+    //- Modals & Toast
+    #modal-kriteria.modal-overlay
+      .modal
+        h3 Edit Kriteria
+        input#edit-k-kode(type="hidden")
+        .form-grid
+          .form-group(style="grid-column:1/-1;")
+            label Nama Kriteria
+            input#edit-k-nama
+          .form-group
+            label Tipe
+            select#edit-k-tipe
+              option(value="Benefit") Benefit
+              option(value="Cost") Cost
+          .form-group
+            label Bobot
+            input#edit-k-bobot(type="number" step="0.01")
+        .modal-footer
+          button.btn.btn-ghost(onclick="closeModal('modal-kriteria')") Batal
+          button.btn.btn-primary(onclick="saveKriteria()") Simpan
+
+    #toast.toast
+
+    script.
+      const API = '';
+      let _kriteria = [], _alternatif = [], _penilaian = [], _hasil = [], _norm = [], _vsDetail = [];
+      
+      // ── Navigation ──────────────────────────────────────────────────────────────
+      function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('page-' + id).classList.add('active');
+        event.currentTarget.classList.add('active');
+        loadPage(id);
+      }
+      
+      function showTab(el, id) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        ['tab-normalisasi','tab-vektors','tab-vektorv'].forEach(t => {
+          document.getElementById(t).style.display = t === id ? '' : 'none';
+        });
+      }
+      
+      // ── Fetch helpers ────────────────────────────────────────────────────────────
+      async function api(path, opts={}) {
+        const res = await fetch(API + path, {
+          headers: {'Content-Type': 'application/json'},
+          ...opts,
+          body: opts.body ? JSON.stringify(opts.body) : undefined
+        });
+        return res.json();
+      }
+      
+      async function loadAll() {
+        [_kriteria, _alternatif, _penilaian, _hasil, _norm, _vsDetail] = await Promise.all([
+          api('/api/kriteria'), api('/api/alternatif'), api('/api/penilaian'),
+          api('/api/hasil'), api('/api/normalisasi'), api('/api/vektor_s_detail')
+        ]);
+      }
+      
+      // ── Toast ────────────────────────────────────────────────────────────────────
+      function toast(msg, type='') {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (type ? ' ' + type : '');
+        setTimeout(() => el.className = 'toast', 2500);
+      }
+      
+      // ── Pages ────────────────────────────────────────────────────────────────────
+      async function loadPage(id) {
+        await loadAll();
+        if (id === 'dashboard') renderDashboard();
+        else if (id === 'kriteria') renderKriteria();
+        else if (id === 'alternatif') renderAlternatif();
+        else if (id === 'penilaian') renderPenilaian();
+        else if (id === 'perhitungan') renderPerhitungan();
+        else if (id === 'hasil') renderHasil();
+      }
+      
+      // ── Dashboard ────────────────────────────────────────────────────────────────
+      function renderDashboard() {
+        document.getElementById('stat-kriteria').textContent = _kriteria.length;
+        document.getElementById('stat-alternatif').textContent = _alternatif.length;
+        const best = _hasil[0];
+        if (best) {
+          document.getElementById('stat-terbaik').textContent = best.nama;
+          document.getElementById('stat-terbaik-v').textContent = 'V = ' + best.vektor_v.toFixed(5);
+        }
+        const maxV = _hasil.length ? _hasil[0].vektor_v : 1;
+        const grid = document.getElementById('ranking-grid');
+        grid.innerHTML = _hasil.map(h => {
+          const pct = (h.vektor_v / maxV * 100).toFixed(1);
+          const sPct = (h.vektor_s / (_hasil[0].vektor_s || 1) * 100).toFixed(1);
+          const medal = h.ranking === 1 ? '🥇' : h.ranking === 2 ? '🥈' : h.ranking === 3 ? '🥉' : '';
+          return `<div class="rank-card rank-${h.ranking}">
+            <div class="rank-badge">${medal}</div>
+            <div class="rank-num">Peringkat ${h.ranking}</div>
+            <div class="rank-name">${h.nama}</div>
+            <div class="rank-code">${h.alternatif_kode}</div>
+            <div class="rank-bars">
+              <div class="rank-bar-row">
+                <span class="rank-bar-label">Vektor V</span>
+                <div class="rank-bar-track"><div class="rank-bar-fill" style="width:${pct}%"></div></div>
+                <span class="rank-bar-val">${h.vektor_v.toFixed(5)}</span>
+              </div>
+              <div class="rank-bar-row">
+                <span class="rank-bar-label">Vektor S</span>
+                <div class="rank-bar-track"><div class="rank-bar-fill" style="width:${sPct}%;background:#7c3aed"></div></div>
+                <span class="rank-bar-val">${h.vektor_s.toFixed(4)}</span>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+      
+      // ── Kriteria ─────────────────────────────────────────────────────────────────
+      function renderKriteria() {
+        const totalBobot = _kriteria.reduce((s, k) => s + k.bobot, 0);
+        const badge = document.getElementById('total-bobot-badge');
+        badge.textContent = 'Total Bobot: ' + totalBobot.toFixed(4);
+        badge.className = 'badge ' + (Math.abs(totalBobot - 1) < 0.001 ? 'badge-benefit' : 'badge-cost');
+      
+        const totalNorm = _norm.reduce((s, n) => s + n.bobot_norm, 0);
+        document.getElementById('kriteria-tbody').innerHTML = _kriteria.map(k => {
+          const norm = _norm.find(n => n.kode === k.kode);
+          const bNorm = norm ? norm.bobot_norm.toFixed(4) : '–';
+          return `<tr>
+            <td><b>${k.kode}</b></td>
+            <td>${k.nama}</td>
+            <td><span class="badge badge-${k.tipe.toLowerCase()}">${k.tipe}</span></td>
+            <td>${k.bobot}</td>
+            <td>${bNorm}</td>
+            <td>
+              <button class="btn btn-sm btn-ghost" onclick="openEditKriteria('${k.kode}')">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteKriteria('${k.kode}')">🗑️</button>
+            </td>
+          </tr>`;
+        }).join('');
+      }
+      
+      async function addKriteria() {
+        const kode = document.getElementById('k-kode').value.trim();
+        const nama = document.getElementById('k-nama').value.trim();
+        const tipe = document.getElementById('k-tipe').value;
+        const bobot = parseFloat(document.getElementById('k-bobot').value);
+        if (!kode || !nama || isNaN(bobot)) return toast('Lengkapi semua field!', 'error');
+        await api('/api/kriteria', {method:'POST', body:{kode, nama, tipe, bobot}});
+        toast('✅ Kriteria ditambahkan');
+        ['k-kode','k-nama','k-bobot'].forEach(id => document.getElementById(id).value = '');
+        loadPage('kriteria');
+      }
+      
+      function openEditKriteria(kode) {
+        const k = _kriteria.find(x => x.kode === kode);
+        document.getElementById('edit-k-kode').value = k.kode;
+        document.getElementById('edit-k-nama').value = k.nama;
+        document.getElementById('edit-k-tipe').value = k.tipe;
+        document.getElementById('edit-k-bobot').value = k.bobot;
+        document.getElementById('modal-kriteria').classList.add('open');
+      }
+      
+      async function saveKriteria() {
+        const kode = document.getElementById('edit-k-kode').value;
+        await api('/api/kriteria/' + kode, {method:'PUT', body:{
+          nama: document.getElementById('edit-k-nama').value,
+          tipe: document.getElementById('edit-k-tipe').value,
+          bobot: parseFloat(document.getElementById('edit-k-bobot').value)
+        }});
+        closeModal('modal-kriteria');
+        toast('✅ Kriteria diperbarui');
+        loadPage('kriteria');
+      }
+      
+      async function deleteKriteria(kode) {
+        if (!confirm(`Hapus kriteria ${kode}? Data penilaian terkait juga akan dihapus.`)) return;
+        await api('/api/kriteria/' + kode, {method:'DELETE'});
+        toast('🗑️ Kriteria dihapus', 'error');
+        loadPage('kriteria');
+      }
+      
+      // ── Alternatif ───────────────────────────────────────────────────────────────
+      function renderAlternatif() {
+        document.getElementById('alternatif-tbody').innerHTML = _alternatif.map(a => `
+          <tr>
+            <td><b>${a.kode}</b></td>
+            <td>${a.nama}</td>
+            <td>
+              <button class="btn btn-sm btn-ghost" onclick="openEditAlternatif('${a.kode}')">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteAlternatif('${a.kode}')">🗑️</button>
+            </td>
+          </tr>`).join('');
+      }
+      
+      async function addAlternatif() {
+        const kode = document.getElementById('a-kode').value.trim();
+        const nama = document.getElementById('a-nama').value.trim();
+        if (!kode || !nama) return toast('Lengkapi semua field!', 'error');
+        await api('/api/alternatif', {method:'POST', body:{kode, nama}});
+        toast('✅ Alternatif ditambahkan');
+        ['a-kode','a-nama'].forEach(id => document.getElementById(id).value = '');
+        loadPage('alternatif');
+      }
+      
+      function openEditAlternatif(kode) {
+        const a = _alternatif.find(x => x.kode === kode);
+        document.getElementById('edit-a-kode').value = a.kode;
+        document.getElementById('edit-a-nama').value = a.nama;
+        document.getElementById('modal-alternatif').classList.add('open');
+      }
+      
+      async function saveAlternatif() {
+        const kode = document.getElementById('edit-a-kode').value;
+        await api('/api/alternatif/' + kode, {method:'PUT', body:{
+          nama: document.getElementById('edit-a-nama').value
+        }});
+        closeModal('modal-alternatif');
+        toast('✅ Alternatif diperbarui');
+        loadPage('alternatif');
+      }
+      
+      async function deleteAlternatif(kode) {
+        if (!confirm(`Hapus alternatif ${kode}?`)) return;
+        await api('/api/alternatif/' + kode, {method:'DELETE'});
+        toast('🗑️ Alternatif dihapus', 'error');
+        loadPage('alternatif');
+      }
+      
+      // ── Penilaian ─────────────────────────────────────────────────────────────────
+      function renderPenilaian() {
+        const head = document.getElementById('penilaian-head');
+        const body = document.getElementById('penilaian-body');
+      
+        // Build lookup
+        const nilaiMap = {};
+        _penilaian.forEach(p => {
+          nilaiMap[p.alternatif_kode + '|' + p.kriteria_kode] = p.nilai;
+        });
+      
+        head.innerHTML = '<tr><th>Kode</th><th>Nama Penyedia</th>' +
+          _kriteria.map(k => `<th title="${k.nama}">${k.kode}<br><small style="color:var(--muted);font-size:10px">${k.tipe}</small></th>`).join('') + '</tr>';
+      
+        body.innerHTML = _alternatif.map(a => {
+          const cells = _kriteria.map(k => {
+            const val = nilaiMap[a.kode + '|' + k.kode] || '';
+            return `<td><input class="nilai-input" type="number" min="1" max="10" step="1"
+              data-alt="${a.kode}" data-krit="${k.kode}" value="${val}" placeholder="–"/></td>`;
+          }).join('');
+          return `<tr><td><b>${a.kode}</b></td><td>${a.nama}</td>${cells}</tr>`;
+        }).join('');
+      }
+      
+      async function savePenilaian() {
+        const inputs = document.querySelectorAll('#penilaian-body .nilai-input');
+        const items = [];
+        for (const inp of inputs) {
+          const val = parseFloat(inp.value);
+          if (!isNaN(val)) {
+            items.push({alternatif_kode: inp.dataset.alt, kriteria_kode: inp.dataset.krit, nilai: val});
+          }
+        }
+        await api('/api/penilaian', {method:'POST', body: items});
+        toast('✅ Penilaian tersimpan & dihitung ulang');
+        loadPage('penilaian');
+      }
+      
+      // ── Perhitungan ───────────────────────────────────────────────────────────────
+      function renderPerhitungan() {
+        // Normalisasi
+        const tbody = document.getElementById('norm-tbody');
+        const totalB = _norm.reduce((s,n)=>s+n.bobot,0);
+        const totalN = _norm.reduce((s,n)=>s+n.bobot_norm,0);
+        tbody.innerHTML = _norm.map(n => `<tr>
+          <td><b>${n.kode}</b></td><td>${n.nama}</td>
+          <td><span class="badge badge-${n.tipe.toLowerCase()}">${n.tipe}</span></td>
+          <td>${n.bobot}</td>
+          <td><b>${n.bobot_norm.toFixed(4)}</b></td>
+        </tr>`).join('') +
+        `<tr style="font-weight:700;background:var(--surface)">
+          <td colspan="3">TOTAL</td><td>${totalB.toFixed(4)}</td><td>${totalN.toFixed(4)}</td>
+        </tr>`;
+      
+        // Vektor S header + rows
+        const vsHead = document.getElementById('vektors-head');
+        const vsTbody = document.getElementById('vektors-tbody');
+      
+        // Build detail lookup
+        const detailMap = {};
+        _vsDetail.forEach(d => { detailMap[d.alternatif_kode+'|'+d.kriteria_kode] = d; });
+      
+        // Pangkat row
+        vsHead.innerHTML = '<tr><th>Kode</th><th>Nama</th>' +
+          _kriteria.map(k => {
+            const norm = _norm.find(n=>n.kode===k.kode);
+            const pangkat = norm ? (k.tipe==='Cost' ? -norm.bobot_norm : norm.bobot_norm).toFixed(4) : '–';
+            return `<th>${k.kode}<br><small style="color:var(--accent);font-size:10px">(${pangkat})</small></th>`;
+          }).join('') + '<th>Nilai S</th></tr>';
+      
+        vsTbody.innerHTML = _hasil.map(h => {
+          const cells = _kriteria.map(k => {
+            const d = detailMap[h.alternatif_kode+'|'+k.kode];
+            return `<td style="font-size:12px">${d ? d.komponen.toFixed(6) : '–'}</td>`;
+          }).join('');
+          return `<tr><td><b>${h.alternatif_kode}</b></td><td>${h.nama}</td>${cells}<td><b>${h.vektor_s.toFixed(6)}</b></td></tr>`;
+        }).join('');
+      
+        // Vektor V
+        const maxV = _hasil.length ? _hasil[0].vektor_v : 1;
+        document.getElementById('vektorv-tbody').innerHTML = _hasil.map(h => {
+          const pct = (h.vektor_v / maxV * 100).toFixed(1);
+          const medal = h.ranking===1?'🥇':h.ranking===2?'🥈':h.ranking===3?'🥉':'';
+          return `<tr>
+            <td>${medal} <b>#${h.ranking}</b></td>
+            <td>${h.alternatif_kode}</td>
+            <td>${h.nama}</td>
+            <td>${h.vektor_s.toFixed(6)}</td>
+            <td><b>${h.vektor_v.toFixed(6)}</b></td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>${pct}%</td>
+          </tr>`;
+        }).join('');
+      }
+      
+      // ── Hasil ─────────────────────────────────────────────────────────────────────
+      function renderHasil() {
+        const best = _hasil[0];
+        if (best) {
+          document.getElementById('rekomendasi-content').innerHTML = `
+            <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+              <div style="font-size:48px;">🏆</div>
+              <div>
+                <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Rekomendasi Terbaik</div>
+                <div style="font-size:22px;font-weight:700;color:var(--rank1)">${best.nama}</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:4px;">
+                  Kode: <b>${best.alternatif_kode}</b> &nbsp;|&nbsp;
+                  Nilai V: <b style="color:var(--green)">${best.vektor_v.toFixed(6)}</b> &nbsp;|&nbsp;
+                  Nilai S: <b>${best.vektor_s.toFixed(6)}</b>
+                </div>
+                <div style="font-size:12px;color:var(--muted);margin-top:8px;">
+                  Penyedia ini memiliki nilai Vektor V tertinggi berdasarkan metode Weighted Product,
+                  dengan mempertimbangkan ${_kriteria.length} kriteria dan ${_alternatif.length} alternatif.
+                </div>
+              </div>
+            </div>`;
+        }
+      
+        const maxV = _hasil.length ? _hasil[0].vektor_v : 1;
+        document.getElementById('hasil-tbody').innerHTML = _hasil.map(h => {
+          const pct = (h.vektor_v / maxV * 100).toFixed(1);
+          const medal = h.ranking===1?'🥇':h.ranking===2?'🥈':h.ranking===3?'🥉':'';
+          const rowStyle = h.ranking===1?'background:rgba(251,191,36,.05)':'';
+          return `<tr style="${rowStyle}">
+            <td>${medal} <b>#${h.ranking}</b></td>
+            <td><b>${h.alternatif_kode}</b></td>
+            <td>${h.nama}</td>
+            <td>${h.vektor_s.toFixed(6)}</td>
+            <td><b style="color:${h.ranking===1?'var(--rank1)':'var(--text)'}">${h.vektor_v.toFixed(6)}</b></td>
+            <td>
+              <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+              ${pct}%
+            </td>
+          </tr>`;
+        }).join('');
+      }
+      
+      // ── Modal ─────────────────────────────────────────────────────────────────────
+      function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+      }
+      document.querySelectorAll('.modal-overlay').forEach(m => {
+        m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+      });
+      
+      // ── Init ──────────────────────────────────────────────────────────────────────
+      loadPage('dashboard');

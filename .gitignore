@@ -1,6 +1,10 @@
-.zed
-cache
+vendor
+deno.lock
+go.sum
 
-*.lock
+db.sqlite
+templates/index.bak.html
+public/commit
+public/inter
 
-public
+spk

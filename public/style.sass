@@ -1,0 +1,560 @@
+@use 'sass:color'
+
+// Variables
+$bg: #e6e6e6
+$surface: #ccc
+$card: #e6e6e6
+$border: #ccc
+$accent: #5b6af0
+$accent2: #7c3aed
+$green: #10b981
+$yellow: #f59e0b
+$red: #ef4444
+$text: #000
+$muted: #808080
+$rank1: #fbbf24
+$rank2: #94a3b8
+$rank3: #cd7c3a
+
+// Reset
+*
+  box-sizing: border-box
+  margin: 0
+  padding: 0
+  
+[hidden]
+  display: none !important
+
+input, textarea, button, select
+  background: inherit
+  font: inherit
+  color: inherit
+
+html
+  -webkit-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  -khtml-user-select: none
+  user-select: none
+  cursor: default
+
+body
+  background: $bg
+  color: $text
+  font:
+    family: 'InterVariable', system-ui, sans-serif
+    feature-settings: 'tnum'
+    variation-settings: 'opsz' 32
+    variant-alternates: styleset(disambiguation)
+  min-height: 100vh
+
+// Layout
+.layout
+  display: flex
+  height: 100vh
+
+.sidebar
+  width: 240px
+  background: $surface
+  border-right: 1px solid $border
+  display: flex
+  flex:
+    direction: column
+    shrink: 0
+
+  .sidebar-logo
+    padding: 20px 16px
+    border-bottom: 1px solid $border
+
+    h2
+      font:
+        size: 13px
+        weight: 700
+      color: $accent
+      text-transform: uppercase
+      letter-spacing: 1px
+
+    p
+      font-size: 11px
+      color: $muted
+      margin-top: 2px
+
+.nav
+  flex: 1
+  padding: 12px 8px
+
+  .nav-item
+    display: flex
+    align-items: center
+    gap: 10px
+    padding: 10px 12px
+    border-radius: 8px
+    cursor: pointer
+    font-size: 13px
+    color: $text
+    transition: all .15s
+    margin-bottom: 2px
+
+    &:hover
+      background: $card
+
+    &.active
+      background: $accent
+      color: #fff
+
+    .ico
+      font-size: 16px
+      width: 20px
+      text-align: center
+
+.main
+  flex: 1
+  overflow-y: auto
+
+// Pages
+.page
+  display: none
+  padding: 28px 32px
+
+  &.active
+    display: block
+
+.page-header
+  margin-bottom: 24px
+
+  h1
+    font:
+      size: 22px
+      weight: 700
+
+  p
+    color: $muted
+    font-size: 13px
+    margin-top: 4px
+
+// Cards
+.card
+  background: $card
+  border: 1px solid $border
+  border-radius: 12px
+  overflow: hidden
+
+  .card-header
+    padding: 14px 20px
+    border-bottom: 1px solid $border
+    display: flex
+    align-items: center
+    justify-content: space-between
+
+    h3
+      font:
+        size: 14px
+        weight: 600
+
+  .card-body
+    padding: 20px
+
+// Tables
+table
+  width: 100%
+  border-collapse: collapse
+  font-size: 13px
+
+  th
+    background: $surface
+    padding: 10px 14px
+    text-align: left
+    font:
+      weight: 600
+      size: 12px
+    color: $muted
+    text-transform: uppercase
+    letter-spacing: .5px
+    border-bottom: 1px solid $border
+
+  td
+    padding: 10px 14px
+    border-bottom: 1px solid $border
+
+  tr
+    &:last-child td
+      border-bottom: none
+
+    &:hover td
+      background: rgba(91, 106, 240, .05)
+
+// Badges
+.badge
+  display: inline-block
+  padding: 2px 8px
+  border-radius: 20px
+  font:
+    size: 11px
+    weight: 600
+
+  &.badge-benefit
+    background: rgba(16, 185, 129, .15)
+    color: $green
+
+  &.badge-cost
+    background: rgba(239, 68, 68, .15)
+    color: $red
+
+// Buttons
+.btn
+  display: inline-flex
+  align-items: center
+  gap: 6px
+  padding: 8px 16px
+  border-radius: 8px
+  font:
+    size: 13px
+    weight: 500
+  cursor: pointer
+  border: none
+  transition: all .15s
+
+  &.btn-primary
+    background: $accent
+    color: #fff
+
+    &:hover
+      background: #4858e0
+
+  &.btn-danger
+    background: rgba(239, 68, 68, .15)
+    color: $red
+
+    &:hover
+      background: rgba(239, 68, 68, .3)
+
+  &.btn-sm
+    padding: 4px 10px
+    font-size: 12px
+
+  &.btn-ghost
+    background: $surface
+    color: $text
+    border: 1px solid $border
+
+    &:hover
+      border-color: $accent
+      color: $accent
+
+// Forms
+.form-grid
+  display: grid
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))
+  gap: 16px
+
+.form-group
+  display: flex
+  flex-direction: column
+  gap: 6px
+
+label
+  font:
+    size: 12px
+    weight: 600
+  color: $muted
+  text-transform: uppercase
+  letter-spacing: .5px
+
+input,
+select
+  background: #fff
+  border: 1px solid $border
+  border-radius: 8px
+  padding: 9px 12px
+  color: $text
+  font-size: 13px
+  width: 100%
+  outline: none
+  transition: border-color .15s
+
+  &:focus
+    border-color: $accent
+
+select option
+  background: $surface
+
+// Dashboard Stat cards
+.stats-grid
+  display: grid
+  grid-template-columns: repeat(4, 1fr)
+  gap: 16px
+  margin-bottom: 24px
+
+.stat-card
+  background: $card
+  border: 1px solid $border
+  border-radius: 12px
+  padding: 20px
+
+  .stat-label
+    font-size: 12px
+    color: $muted
+    text-transform: uppercase
+    letter-spacing: .5px
+
+  .stat-value
+    font:
+      size: 28px
+      weight: 700
+    margin-top: 4px
+
+  .stat-sub
+    font-size: 12px
+    color: $muted
+    margin-top: 4px
+
+// Ranking cards
+.ranking-grid
+  display: grid
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))
+  gap: 16px
+
+.rank-card
+  background: $card
+  border: 1px solid $border
+  border-radius: 12px
+  padding: 20px
+  position: relative
+  overflow: hidden
+
+  &.rank-1
+    border-color: $rank1
+
+  &.rank-2
+    border-color: $rank2
+
+  &.rank-3
+    border-color: $rank3
+
+  .rank-badge
+    position: absolute
+    top: 14px
+    right: 14px
+    font-size: 24px
+
+  .rank-num
+    font:
+      size: 11px
+      weight: 600
+    color: $muted
+    text-transform: uppercase
+    letter-spacing: .5px
+
+  .rank-name
+    font:
+      size: 16px
+      weight: 700
+    margin-top: 4px
+
+  .rank-code
+    font-size: 11px
+    color: $muted
+
+  .rank-bars
+    margin-top: 14px
+
+    .rank-bar-row
+      display: flex
+      align-items: center
+      gap: 8px
+      margin-top: 8px
+      font-size: 12px
+
+      .rank-bar-label
+        color: $muted
+        width: 55px
+
+      .rank-bar-track
+        flex: 1
+        height: 6px
+        background: $surface
+        border-radius: 3px
+        overflow: hidden
+
+        .rank-bar-fill
+          height: 100%
+          border-radius: 3px
+          background: $accent
+
+      .rank-bar-val
+        color: $text
+        font-weight: 600
+        width: 55px
+        text-align: right
+
+// Penilaian grid
+.nilai-cell
+  width: 80px
+
+  .nilai-input
+    min-width: 80px
+    padding: 5px 8px
+    font-size: 12px
+    text-align: center
+
+// Progress
+.progress-bar
+  height: 6px
+  background: $surface
+  border-radius: 3px
+  overflow: hidden
+  display: inline-block
+  width: 80px
+  vertical-align: middle
+  margin-right: 6px
+
+  .progress-fill
+    height: 100%
+    border-radius: 3px
+    background: $accent
+
+// Tabs
+.tabs
+  display: flex
+  gap: 4px
+  margin-bottom: 20px
+
+  .tab
+    padding: 8px 16px
+    border-radius: 8px
+    font-size: 13px
+    cursor: pointer
+    color: $muted
+    transition: all .15s
+
+    &.active
+      background: $accent
+      color: #fff
+
+    &:hover:not(.active)
+      color: $text
+      background: $card
+
+// Toast
+.toast
+  position: fixed
+  bottom: 24px
+  right: 24px
+  background: $green
+  color: #fff
+  padding: 12px 20px
+  border-radius: 10px
+  font:
+    size: 13px
+    weight: 500
+  z-index: 9999
+  opacity: 0
+  transition: opacity .2s
+  pointer-events: none
+
+  &.show
+    opacity: 1
+
+  &.error
+    background: $red
+
+// Formula box
+.formula-box
+  background: $surface
+  border: 1px solid $border
+  border-radius: 8px
+  padding: 14px 18px
+  font:
+    family: 'Commit Mono', monospace
+    size: 13px
+  color: $text
+  margin-bottom: 16px
+
+// Section divider
+.section-gap
+  margin-top: 24px
+
+// Modal overlay
+.modal-overlay
+  display: none
+  position: fixed
+  inset: 0
+  background: rgba(0, 0, 0, .6)
+  z-index: 1000
+  align-items: center
+  justify-content: center
+
+  &.open
+    display: flex
+
+.modal
+  background: $card
+  border: 1px solid $border
+  border-radius: 16px
+  padding: 28px
+  min-width: 400px
+  max-width: 95vw
+
+  h3
+    font:
+      size: 16px
+      weight: 700
+    margin-bottom: 20px
+
+  .modal-footer
+    display: flex
+    gap: 10px
+    justify-content: flex-end
+    margin-top: 20px
+
+.penilaian-small
+  color: $muted
+  font-size: 10px
+
+.perhitungan-tr
+  font-weight: 700
+  background: $surface
+
+.perhitungan-small
+  color: $accent
+  font-size: 10px
+
+.hasil-div1
+  font-size: 12px
+  color: $muted
+  text-transform: uppercase
+  letter-spacing: .5px
+.hasil-div2
+  font-size: 22px
+  font-weight: 700
+  color: $rank1
+.hasil-div3
+  font-size: 13px
+  color: $muted
+  margin-top: 4px
+.hasil-div4
+  font-size: 12px
+  color: $muted
+  margin-top: 8px
+
+.hasil-b-all
+  color: $green
+.hasil-b-rank
+  color: $rank1
+.hasil-b-remain
+  color: $text
+
+// Responsive
+// @media (max-width: 900px)
+//   .stats-grid
+//     grid-template-columns: repeat(2, 1fr)
+
+//   .sidebar
+//     width: 56px
+
+//     .nav-item span
+//       display: none
+
+//     .sidebar-logo
+//       p, h2
+//         display: none
